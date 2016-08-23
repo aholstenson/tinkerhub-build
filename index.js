@@ -1,30 +1,19 @@
-/**
- * Gulp is used to be able to use ES6 when developing but to publish ES5 to NPM.
- */
+'use strict';
 
 module.exports = function() {
-    var gulp = require('gulp');
-    var sourcemaps = require('gulp-sourcemaps');
-    var babel = require('gulp-babel');
-    var plumber = require('gulp-plumber');
-    var notify = require('gulp-notify');
-    var jshint = require('gulp-jshint');
-    var path = require('path');
+    const gulp = require('gulp');
+    const notify = require('gulp-notify');
+    const plumber = require('gulp-plumber');
 
-    var src = 'src/**/*.js';
-    var srcRoot = path.join(__dirname, 'src');
-    var dist = 'dist';
+    const eslint = require('gulp-eslint');
+
+    const src = 'lib/**/*.js';
 
     gulp.task('build', function() {
         return gulp.src(src)
-            .pipe(jshint('.jshintrc'))
-            .pipe(jshint.reporter('jshint-stylish'))
-            .pipe(sourcemaps.init())
-            .pipe(babel())
-            .pipe(sourcemaps.write('.', {
-                sourceRoot: srcRoot
-            }))
-            .pipe(gulp.dest(dist));
+            .pipe(eslint())
+            .pipe(eslint.format())
+            .pipe(eslint.failAfterError());
     });
 
     gulp.task('build:dev', function() {
@@ -32,14 +21,9 @@ module.exports = function() {
             .pipe(plumber(({
                 errorHandler: notify.onError('<%= error.message %>')
             })))
-            .pipe(jshint('.jshintrc'))
-            .pipe(jshint.reporter('jshint-stylish'))
-            .pipe(sourcemaps.init())
-            .pipe(babel())
-            .pipe(sourcemaps.write('.', {
-                sourceRoot: srcRoot
-            }))
-            .pipe(gulp.dest(dist));
+
+            .pipe(eslint())
+            .pipe(eslint.format());
     });
 
     gulp.task('dev', [ 'build:dev' ], function() {
